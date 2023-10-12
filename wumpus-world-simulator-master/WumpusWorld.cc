@@ -8,7 +8,7 @@
 #include <algorithm>
 #include "WumpusWorld.h"
 
-#define PIT_PROBABILITY 0.2
+#define PIT_PROBABILITY 0
 
 using namespace std;
 
@@ -25,7 +25,10 @@ WumpusWorld::WumpusWorld (int size)
 		x = (rand() % size) + 1;
 		y = (rand() % size) + 1;
 	}
-	currentState.wumpusLocation = Location (x, y);
+	
+	/*						IMPORTANT							*/
+	/*		CHANGED FOR HW3! WUMPUS WILL ALWAYS BE ON (4,4)		*/
+	currentState.wumpusLocation = Location (4, 4);
 
 	// Choose gold location (anywhere except [1,1])
 	x = 1; y=1;

@@ -23,7 +23,7 @@ using namespace std;
 int main (int argc, char *argv[])
 {
 	int worldSize = 4;
-	int numTrials = 1;
+	int numTrials = 1000;
 	int numTries = 1;
 	unsigned seed;
 	char* worldFile;
@@ -101,9 +101,14 @@ int main (int argc, char *argv[])
 	Percept percept;
 	Action action;
 	int score;
+	int scoreGold = 0;
+	int totalScoreGold = 0;
 	int trialScore;
 	int totalScore = 0;
 	float averageScore;
+	int lowestScore = 1000;
+	int highestScore = 0;
+	int wumpKills = 0;
 	int numMoves;
 
 	for (int trial = 1; trial <= numTrials; trial++)
@@ -131,17 +136,31 @@ int main (int argc, char *argv[])
 			{
 				wumpusWorld->Print();
 				percept = wumpusWorld->GetPercept();
+				if(percept.Scream){
+					wumpKills++;
+				}
 				action = agent->Process (percept);
 				cout << "Action = ";
 				PrintAction (action);
 				cout << endl << endl;
 				wumpusWorld->ExecuteAction (action);
 				numMoves++;
+				if(action == 3){
+					scoreGold = wumpusWorld->GetScore();
+					totalScoreGold = totalScoreGold + scoreGold;
+				}
 			}
 			score = wumpusWorld->GetScore();
 			agent->GameOver (score);
 			trialScore = trialScore + score;
 			cout << "Trial " << trial << ", Try " << tries << " complete: Score = " << score << endl << endl;
+			cout << "Points used finding the gold: " << scoreGold*-1 << endl << endl;
+			if(score < lowestScore){
+				lowestScore = score;
+			}
+			if(score > highestScore){
+				highestScore = score;
+			}
 		}
 		delete agent;
 		delete wumpusWorld;
@@ -150,7 +169,12 @@ int main (int argc, char *argv[])
 		totalScore = totalScore + trialScore;
 	}
 	averageScore = ((float) totalScore) / ((float) (numTrials * numTries));
-	cout << "All trials completed: Average score for all trials = " << averageScore << endl;
+	cout << "All trials completed: Average score for all trials = " << averageScore << endl << endl;
+	cout << "Lowest Score = " << lowestScore << endl;
+	cout << "Highest Score = " << highestScore << endl;
+	cout << "Average Points used finding the gold = " << ((float) totalScoreGold) / ((float) (numTrials * numTries))*(-1) << endl;
+	cout << "Average Points used leaving the cave after getting the gold = " << (1000 - averageScore) - (((float) totalScoreGold) / ((float) (numTrials * numTries))*(-1)) << endl;
+	cout << "Times the Wumpus was killed = " << wumpKills << endl;
 	cout << "Thanks for playing!" << endl << endl;
 
 #ifdef PYTHON
